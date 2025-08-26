@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace OrderService.Domain.Entity
+{
+    public class OrderItem : BaseEntity
+    {
+        public Guid OrderId { get; private set; }
+        public Guid ProductId { get; private set; }
+        public int Quantity { get; private set; }
+        public decimal UnitPrice { get; private set; }
+        public decimal LineTotal { get; private set; }
+        public Order Order { get; private set; }
+
+        public OrderItem() { }
+
+        public OrderItem(Order order, Guid productId, int quantity, decimal unitPrice)
+        {
+            Order = order ?? throw new ArgumentNullException(nameof(order));
+            OrderId = order.Id;
+            ProductId = productId;
+            Quantity = quantity;
+            UnitPrice = unitPrice;
+            LineTotal = unitPrice * quantity;
+        }
+    }
+}

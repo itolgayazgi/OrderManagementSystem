@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: godlike
+      POSTGRES_PASSWORD: secretsecret
+      POSTGRES_DB: OrderInvoiceDb
+    ports:
+      - "5433:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+
+  orderapi:
+    build:
+      context: .
+      dockerfile: OrderService.API/Dockerfile
+    environment:
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=OrderInvoiceDb;Username=godlike;Password=secretsecret"
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_URLS: "http://+:8080"
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+
+volumes:
+  dbdata: {}
