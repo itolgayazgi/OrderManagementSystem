@@ -29,8 +29,6 @@ namespace OrderService.Infrastructure.Persistence.Configurations
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasIndex(x => x.Status);
-
-            builder.HasIndex(x => x.Status);
         }
     }
 }

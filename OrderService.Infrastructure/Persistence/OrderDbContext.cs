@@ -19,8 +19,8 @@ namespace OrderService.Infrastructure.Persistence
         public DbSet<InvoiceJob> InvoiceJob => Set<InvoiceJob>();
 
         // (EDA için öneri) Outbox/Inbox ekleyeceğiz; şimdilik atlayabilirsin.
-        // public DbSet<OutboxMessage> Outbox => Set<OutboxMessage>();
-        // public DbSet<InboxMessage>  Inbox  => Set<InboxMessage>();
+        public DbSet<OutboxMessage> OutboxMessage => Set<OutboxMessage>();
+        public DbSet<InboxMessage> InboxMessage => Set<InboxMessage>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

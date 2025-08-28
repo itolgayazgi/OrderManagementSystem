@@ -1,19 +1,25 @@
-# BUILD
+# ----- build -----
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["src/OrderService.API/OrderService.API.csproj","src/OrderService.API/"]
-COPY ["src/OrderService.Infrastructure/OrderService.Infrastructure.csproj","src/OrderService.Infrastructure/"]
-COPY ["src/OrderService.Domain/OrderService.Domain.csproj","src/OrderService.Domain/"]
-COPY ["src/OrderService.Application/OrderService.Application.csproj","src/OrderService.Application/"]
-RUN dotnet restore "src/OrderService.API/OrderService.API.csproj"
-COPY src/ ./src/
-WORKDIR /src/OrderService.API
-RUN dotnet publish -c Release -o /app
 
-# RUNTIME
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# solution ve projeleri kopyala
+COPY ./OrderService.API/OrderService.API.csproj ./OrderService.API/
+COPY ./OrderService.Application/OrderService.Application.csproj ./OrderService.Application/
+COPY ./OrderService.Infrastructure/OrderService.Infrastructure.csproj ./OrderService.Infrastructure/
+COPY ./OrderService.Domain/OrderService.Domain.csproj ./OrderService.Domain/
+RUN dotnet restore ./OrderService.API/OrderService.API.csproj
+
+# tüm kodu kopyala ve publish et
+COPY . .
+RUN dotnet publish ./OrderService.API/OrderService.API.csproj -c Release -o /app/publish
+
+# ----- runtime -----
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app .
+
+# Container içinde HTTPS yerine HTTP kullanacaðýz
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
-ENTRYPOINT ["dotnet","OrderService.API.dll"]
+
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "OrderService.API.dll"]
