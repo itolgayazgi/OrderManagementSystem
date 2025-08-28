@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace OrderService.Domain.Entity
@@ -13,6 +14,7 @@ namespace OrderService.Domain.Entity
         public int Quantity { get; private set; }
         public decimal UnitPrice { get; private set; }
         public decimal LineTotal { get; private set; }
+        [JsonIgnore]
         public Order Order { get; private set; }
 
         public OrderItem() { }

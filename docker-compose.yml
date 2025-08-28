@@ -3,27 +3,79 @@ version: "3.9"
 services:
   db:
     image: postgres:16
+    container_name: order-db
     environment:
-      POSTGRES_USER: godlike
-      POSTGRES_PASSWORD: secretsecret
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: OrderInvoiceDb
     ports:
       - "5433:5432"
     volumes:
       - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d OrderInvoiceDb"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  rabbit:
+    image: rabbitmq:3.13-management
+    container_name: order-rabbit
+    ports:
+      - "5672:5672"     # AMQP
+      - "15672:15672"   # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   orderapi:
     build:
       context: .
       dockerfile: OrderService.API/Dockerfile
+    container_name: order-api
     environment:
-      ConnectionStrings__Default: "Host=db;Port=5432;Database=OrderInvoiceDb;Username=godlike;Password=secretsecret"
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=OrderInvoiceDb;Username=postgres;Password=password"
       ASPNETCORE_ENVIRONMENT: "Development"
       ASPNETCORE_URLS: "http://+:8080"
+      Rabbit__Host: "rabbit"
+      Rabbit__User: "admin"
+      Rabbit__Pass: "admin"
+      Rabbit__Port: "5672"
+      Rabbit__Exchange: "order-ex"
+      Rabbit__RoutingKey: "order.created"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      rabbit:
+        condition: service_healthy
     ports:
       - "8080:8080"
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: OrderService.OutboxWorker/Dockerfile
+    container_name: order-worker
+    environment:
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=OrderInvoiceDb;Username=postgres;Password=password"
+      Rabbit__Host: "rabbit"
+      Rabbit__User: "admin"
+      Rabbit__Pass: "admin"
+      Rabbit__Port: "5672"
+      Rabbit__Exchange: "order-ex"
+      Rabbit__RoutingKey: "order.created"
+      Invoice__SimulatedLatencyMs: "400"
+    depends_on:
+      - db
+      - rabbit
+      - orderapi
+    restart: unless-stopped
 
 volumes:
-  dbdata: {}
+  dbdata:

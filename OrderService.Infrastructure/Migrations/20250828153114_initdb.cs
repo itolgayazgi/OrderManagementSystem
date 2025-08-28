@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace OrderService.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class initDb : Migration
+    public partial class initdb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,6 +30,22 @@ namespace OrderService.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InboxMessage",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    MessageId = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    ProcessedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EventType = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InboxMessage", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Invoice",
                 columns: table => new
                 {
@@ -38,6 +54,7 @@ namespace OrderService.Infrastructure.Migrations
                     InvoiceNo = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     ExternalTraceId = table.Column<string>(type: "text", nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -79,6 +96,25 @@ namespace OrderService.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Order", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OutboxMessage",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    EventType = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    Payload = table.Column<string>(type: "jsonb", nullable: false),
+                    ProcessedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    RetryCount = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    Error = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    ProcessAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OutboxMessage", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -129,6 +165,17 @@ namespace OrderService.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_InboxMessage_MessageId_EventType",
+                table: "InboxMessage",
+                columns: new[] { "MessageId", "EventType" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InboxMessage_ProcessedAt",
+                table: "InboxMessage",
+                column: "ProcessedAt");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Invoice_InvoiceNo",
                 table: "Invoice",
                 column: "InvoiceNo",
@@ -157,6 +204,21 @@ namespace OrderService.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_OutboxMessage_CreatedAt",
+                table: "OutboxMessage",
+                column: "CreatedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OutboxMessage_EventType",
+                table: "OutboxMessage",
+                column: "EventType");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OutboxMessage_ProcessedAt_ProcessAt",
+                table: "OutboxMessage",
+                columns: new[] { "ProcessedAt", "ProcessAt" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Product_Sku",
                 table: "Product",
                 column: "Sku",
@@ -170,6 +232,9 @@ namespace OrderService.Infrastructure.Migrations
                 name: "IdempotencyKey");
 
             migrationBuilder.DropTable(
+                name: "InboxMessage");
+
+            migrationBuilder.DropTable(
                 name: "Invoice");
 
             migrationBuilder.DropTable(
@@ -177,6 +242,9 @@ namespace OrderService.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "OrderItem");
+
+            migrationBuilder.DropTable(
+                name: "OutboxMessage");
 
             migrationBuilder.DropTable(
                 name: "Product");

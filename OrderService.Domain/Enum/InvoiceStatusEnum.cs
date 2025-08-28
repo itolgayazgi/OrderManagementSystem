@@ -8,7 +8,8 @@ namespace OrderService.Domain.Enum
 {
     public enum InvoiceStatus
     {
-        Created = 10,
-        Failed = 20
+        Created = 0,
+        Completed = 1,
+        Failed = 2
     }
 }

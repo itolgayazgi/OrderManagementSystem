@@ -5,8 +5,6 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.API", "OrderService.API\OrderService.API.csproj", "{3FFE5F2B-F91F-404A-AE10-68B384F4605A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Order", "Order", "{0615B52D-CAF9-477F-9EFE-9F65B4E9C8F4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Application", "OrderService.Application\OrderService.Application.csproj", "{BF146992-DD65-4B5E-A616-99907193452D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Domain", "OrderService.Domain\OrderService.Domain.csproj", "{69ED41CB-5407-407B-B60B-B9FB0BB9C0FA}"
@@ -16,7 +14,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5831A392-2887-4E18-99D6-C856965BF749}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
+		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.OutboxWorker", "OrderService.Worker\OrderService.OutboxWorker.csproj", "{8C14AB1F-7FC5-437C-8539-80F7C4AC57B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,14 +41,12 @@ Global
 		{9699FE03-29E9-4B76-872B-F414EC12532E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9699FE03-29E9-4B76-872B-F414EC12532E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9699FE03-29E9-4B76-872B-F414EC12532E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C14AB1F-7FC5-437C-8539-80F7C4AC57B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C14AB1F-7FC5-437C-8539-80F7C4AC57B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C14AB1F-7FC5-437C-8539-80F7C4AC57B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C14AB1F-7FC5-437C-8539-80F7C4AC57B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{3FFE5F2B-F91F-404A-AE10-68B384F4605A} = {0615B52D-CAF9-477F-9EFE-9F65B4E9C8F4}
-		{BF146992-DD65-4B5E-A616-99907193452D} = {0615B52D-CAF9-477F-9EFE-9F65B4E9C8F4}
-		{69ED41CB-5407-407B-B60B-B9FB0BB9C0FA} = {0615B52D-CAF9-477F-9EFE-9F65B4E9C8F4}
-		{9699FE03-29E9-4B76-872B-F414EC12532E} = {0615B52D-CAF9-477F-9EFE-9F65B4E9C8F4}
 	EndGlobalSection
 EndGlobal
