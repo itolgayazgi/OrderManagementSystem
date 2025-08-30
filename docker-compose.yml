@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:16
@@ -27,6 +25,7 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
+      RABBITMQ_DEFAULT_VHOST: /
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 5s
@@ -40,7 +39,7 @@ services:
     container_name: order-api
     environment:
       ConnectionStrings__Default: "Host=db;Port=5432;Database=OrderInvoiceDb;Username=postgres;Password=password"
-      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_ENVIRONMENT: "Production"
       ASPNETCORE_URLS: "http://+:8080"
       Rabbit__Host: "rabbit"
       Rabbit__User: "admin"
@@ -56,6 +55,11 @@ services:
     ports:
       - "8080:8080"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/health/ready || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   worker:
     build:
@@ -68,13 +72,19 @@ services:
       Rabbit__User: "admin"
       Rabbit__Pass: "admin"
       Rabbit__Port: "5672"
+      Rabbit__VirtualHost: "/"
       Rabbit__Exchange: "order-ex"
       Rabbit__RoutingKey: "order.created"
+      Rabbit__Queue: "q-order-created"
       Invoice__SimulatedLatencyMs: "400"
+      ASPNETCORE_ENVIRONMENT: "Production"
     depends_on:
-      - db
-      - rabbit
-      - orderapi
+      db:
+        condition: service_healthy
+      rabbit:
+        condition: service_healthy
+      orderapi:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:

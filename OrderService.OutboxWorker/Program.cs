@@ -8,7 +8,13 @@ using OrderService.OutboxWorker.Messaging;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddDbContext<OrderDbContext>(o =>
+
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables(); //docker veya local için
+
+builder.Services.AddDbContext<OrderDbContext>(o =>  
     o.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 // Rabbit publisher (aynı sınıfı kullanıyoruz)
