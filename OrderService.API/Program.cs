@@ -9,6 +9,11 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration
+  .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+  .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+  .AddEnvironmentVariables();
+
 // DB
 builder.Services.AddDbContext<OrderDbContext>(o =>
     o.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
@@ -27,7 +32,6 @@ builder.Services.AddControllers().AddJsonOptions(o =>
 
 // Health checks
 var cs = builder.Configuration.GetConnectionString("Default");
-Console.WriteLine(cs);
 builder.Services.AddHealthChecks()
     .AddNpgSql(cs!, name: "postgres",
         failureStatus: HealthStatus.Unhealthy,
@@ -99,15 +103,14 @@ using (var scope = app.Services.CreateScope())
 }
 
 // **HTTP pipeline**
-if (!app.Environment.IsDevelopment())
-    app.UseHttpsRedirection();          
+//if (!app.Environment.IsDevelopment())
+//    app.UseHttpsRedirection();          
 app.UseAuthorization();
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Order & Invoice API v1");
-    // c.RoutePrefix = "swagger"; // default zaten /swagger
 });
 
 // Health endpoints

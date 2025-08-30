@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-OrderService.Worker-bdbb82c9-47b2-4c35-890b-8f96c9647622</UserSecretsId>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishSingleFile>false</PublishSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
