@@ -1,4 +1,4 @@
-# Proje ana branch'i 'main' oldugunda tetiklenir
+# Proje ana branch'i 'master' oldugunda tetiklenir
 trigger:
 - master
 
@@ -8,14 +8,17 @@ pool:
 
 # Degiskenler - Kendi kaynak isimlerinize gore guncelleyin
 variables:
-  # Azure Service Connection isminiz
+  # Azure Service Connection isminiz (Deploy adiminda kullanilir)
   azureServiceConnection: 'AzureConnection'
 
   # Azure Kaynak Grubunuz
   resourceGroup: 'DevOpsCG'
   
   # Azure Container Registry isminiz
-  containerRegistry: 'orderinvoicems'
+  containerRegistryName: 'orderinvoicems' # Sadece referans icin ismini degistirdim, kullanilmiyor
+
+  # Docker Service Connection isminiz (Build adiminda kullanilir)
+  dockerRegistryServiceConnection: 'ACRConnection'
 
   # API App Service isminiz
   apiAppName: 'orderservice-api-cg'
@@ -47,7 +50,7 @@ stages:
         command: buildAndPush
         repository: $(apiImageName)
         dockerfile: $(apiDockerfile)
-        containerRegistry: $(containerRegistry)
+        containerRegistry: $(dockerRegistryServiceConnection)  # Düzeltilmiþ kýsým
         tags: |
           $(Build.BuildId)
           latest
@@ -59,7 +62,7 @@ stages:
         command: buildAndPush
         repository: $(workerImageName)
         dockerfile: $(workerDockerfile)
-        containerRegistry: $(containerRegistry)
+        containerRegistry: $(dockerRegistryServiceConnection)  # Düzeltilmiþ kýsým
         tags: |
           $(Build.BuildId)
           latest
@@ -77,7 +80,7 @@ stages:
       inputs:
         azureSubscription: $(azureServiceConnection)
         appName: $(apiAppName)
-        imageName: '$(containerRegistry).azurecr.io/$(apiImageName):$(Build.BuildId)'
+        imageName: '$(containerRegistryName).azurecr.io/$(apiImageName):$(Build.BuildId)'
 
     # 2. Worker App Service'i guncelle
     - task: AzureWebAppContainer@1
@@ -85,4 +88,4 @@ stages:
       inputs:
         azureSubscription: $(azureServiceConnection)
         appName: $(workerAppName)
-        imageName: '$(containerRegistry).azurecr.io/$(workerImageName):$(Build.BuildId)'
+        imageName: '$(containerRegistryName).azurecr.io/$(workerImageName):$(Build.BuildId)'
