@@ -1,6 +1,6 @@
 # Proje ana branch'i 'main' oldugunda tetiklenir
 trigger:
-- main
+- master
 
 # Pipeline'in calisacagi sanal makine
 pool:
