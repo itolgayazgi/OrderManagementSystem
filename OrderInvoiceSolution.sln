@@ -13,6 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Infrastructure
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5831A392-2887-4E18-99D6-C856965BF749}"
 	ProjectSection(SolutionItems) = preProject
+		azure-pipelines.yml = azure-pipelines.yml
 		docker-compose.yml = docker-compose.yml
 		README.md = README.md
 	EndProjectSection
@@ -48,5 +49,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BF146992-DD65-4B5E-A616-99907193452D} = {00000000-0000-0000-0000-000000000000}
+		{69ED41CB-5407-407B-B60B-B9FB0BB9C0FA} = {00000000-0000-0000-0000-000000000000}
 	EndGlobalSection
 EndGlobal
