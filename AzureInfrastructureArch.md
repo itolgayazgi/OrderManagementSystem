@@ -1,32 +1,32 @@
 ﻿```mermaid
 graph TD
     subgraph "Geliştirme Ortamı"
-        Developer[💻 Geliştirici]
+        Developer["💻 Geliştirici"]
     end
 
     subgraph "Kod & Versiyon Kontrol"
-        GitHub[🐙 GitHub Repository]
+        GitHub["🐙 GitHub Repository"]
     end
 
     subgraph "CI/CD Süreci"
-        AzureDevOps[🚀 Azure DevOps Pipeline]
+        AzureDevOps["🚀 Azure DevOps Pipeline"]
     end
 
-    subgraph "Azure Altyapısı. (Kaynak Grubu: DevOpsCG)"
-        ACR[📦 Azure Container Registry<br>(orderinvoicems)]
+    subgraph "Azure Altyapısı (Kaynak Grubu: DevOpsCG)"
+        ACR["📦 Azure Container Registry<br>(orderinvoicems)"]
         
         subgraph "Uygulama Servisleri"
-            AppServiceAPI[🌐 App Service API<br>(orderservice-api-cg)]
-            AppServiceWorker[⚙️ App Service Worker<br>(orderservice-worker-cg)]
+            AppServiceAPI["🌐 App Service API<br>(orderservice-api-cg)"]
+            AppServiceWorker["⚙️ App Service Worker<br>(orderservice-worker-cg)"]
         end
         
         subgraph "Bağımlılıklar"
-            PostgreSQL[🗄️ Azure DB for PostgreSQL<br>(orderservice-db-server-tolga)]
-            ServiceBus[✉️ Azure Service Bus<br>(orderservice-bus-cg)]
+            PostgreSQL["🗄️ Azure DB for PostgreSQL<br>(orderservice-db-server-tolga)"]
+            ServiceBus["✉️ Azure Service Bus<br>(orderservice-bus-cg)"]
         end
     end
 
-    User[👤 Kullanıcı]
+    User["👤 Kullanıcı"]
 
     Developer -- "1. git push" --> GitHub
     GitHub -- "2. Tetikler (Webhook)" --> AzureDevOps
