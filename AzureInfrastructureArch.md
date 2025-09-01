@@ -1,4 +1,5 @@
-﻿graph TD
+﻿```mermaid
+graph TD
     subgraph "Geliştirme Ortamı"
         Developer[💻 Geliştirici]
     end
@@ -11,7 +12,7 @@
         AzureDevOps[🚀 Azure DevOps Pipeline]
     end
 
-    subgraph "Azure Altyapısı (Kaynak Grubu: DevOpsCG)"
+    subgraph "Azure Altyapısı. (Kaynak Grubu: DevOpsCG)"
         ACR[📦 Azure Container Registry<br>(orderinvoicems)]
         
         subgraph "Uygulama Servisleri"
@@ -41,3 +42,4 @@
     AppServiceAPI -- "Mesaj Gönderir" --> ServiceBus
     ServiceBus -- "Mesajı İletir" --> AppServiceWorker
     AppServiceWorker -- "Veri Okuma/Yazma" --> PostgreSQL
+```
