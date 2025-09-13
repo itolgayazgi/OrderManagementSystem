@@ -1,0 +1,91 @@
+# Proje ana branch'i 'master' oldugunda tetiklenir
+trigger:
+- master
+
+# Pipeline'in calisacagi sanal makine
+pool:
+  vmImage: 'ubuntu-latest'
+
+# Degiskenler - Kendi kaynak isimlerinize gore guncelleyin
+variables:
+  # Azure Service Connection isminiz (Deploy adiminda kullanilir)
+  azureServiceConnection: 'AzureConnection'
+
+  # Azure Kaynak Grubunuz
+  resourceGroup: 'DevOpsCG'
+  
+  # Azure Container Registry isminiz
+  containerRegistryName: 'orderinvoicems' # Sadece referans icin ismini degistirdim, kullanilmiyor
+
+  # Docker Service Connection isminiz (Build adiminda kullanilir)
+  dockerRegistryServiceConnection: 'ACRConnection'
+
+  # API App Service isminiz
+  apiAppName: 'orderservice-api-cg'
+  
+  # Worker App Service isminiz
+  workerAppName: 'orderservice-worker-cg'
+  
+  # API Dockerfile yolu
+  apiDockerfile: 'OrderService.API/Dockerfile'
+
+  # Worker Dockerfile yolu
+  workerDockerfile: 'OrderService.OutboxWorker/Dockerfile'
+
+  # Ýmaj isimleri
+  apiImageName: 'orderservice-api'
+  workerImageName: 'orderservice-worker'
+
+stages:
+- stage: Build
+  displayName: 'Build and Push Docker Images'
+  jobs:
+  - job: BuildAndPush
+    displayName: 'Build and Push'
+    steps:
+    # 1. API imajini olustur ve ACR'ye gonder
+    - task: Docker@2
+      displayName: 'Build and Push API Image'
+      inputs:
+        command: buildAndPush
+        repository: $(apiImageName)
+        dockerfile: $(apiDockerfile)
+        containerRegistry: $(dockerRegistryServiceConnection)  # Düzeltilmiþ kýsým
+        tags: |
+          $(Build.BuildId)
+          latest
+
+    # 2. Worker imajini olustur ve ACR'ye gonder
+    - task: Docker@2
+      displayName: 'Build and Push Worker Image'
+      inputs:
+        command: buildAndPush
+        repository: $(workerImageName)
+        dockerfile: $(workerDockerfile)
+        containerRegistry: $(dockerRegistryServiceConnection)  # Düzeltilmiþ kýsým
+        tags: |
+          $(Build.BuildId)
+          latest
+
+- stage: Deploy
+  displayName: 'Deploy to Azure App Services'
+  dependsOn: Build
+  jobs:
+  - job: DeployToAzure
+    displayName: 'Deploy Services'
+    steps:
+    # 1. API App Service'i guncelle
+    - task: AzureWebAppContainer@1
+      displayName: 'Deploy API App Service'
+      inputs:
+        azureSubscription: $(azureServiceConnection)
+        appName: $(apiAppName)
+        imageName: '$(containerRegistryName).azurecr.io/$(apiImageName):$(Build.BuildId)'
+
+    # 2. Worker App Service'i guncelle
+    - task: AzureWebAppContainer@1
+      displayName: 'Deploy Worker App Service'
+      inputs:
+        azureSubscription: $(azureServiceConnection)
+        appName: $(workerAppName)
+        imageName: '$(containerRegistryName).azurecr.io/$(workerImageName):$(Build.BuildId)'
